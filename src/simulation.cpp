@@ -1,10 +1,12 @@
 #include "simulation.h"
 
 #include <iostream>
+#include <unordered_set>
 
 #include "graphics/MeshLoader.h"
 
 using namespace Eigen;
+using namespace std;
 
 Simulation::Simulation()
 {
@@ -24,11 +26,7 @@ void Simulation::init()
         //    hard-coded for the single-tet mesh. You'll need to implement surface mesh extraction
         //    for arbitrary tet meshes. Think about how you can identify which tetrahedron faces
         //    are surface faces...
-        std::vector<Vector3i> faces;
-        faces.emplace_back(1, 0, 2);
-        faces.emplace_back(2, 0, 3);
-        faces.emplace_back(3, 1, 2);
-        faces.emplace_back(3, 0, 1);
+        std::vector<Vector3i> faces = computeSurfaceFaces(tets, vertices);
         m_shape.init(vertices, faces, tets);
     }
     m_shape.setModelMatrix(Affine3f(Eigen::Translation3f(0, 2, 0)));
@@ -70,4 +68,60 @@ void Simulation::initGround()
     groundFaces.emplace_back(0, 1, 2);
     groundFaces.emplace_back(0, 2, 3);
     m_ground.init(groundVerts, groundFaces);
+}
+
+Vector3i sortedTuple(Vector3i tuple) {
+    int mn = min(min(tuple[0], tuple[1]), tuple[2]);
+    int mx = max(max(tuple[0], tuple[1]), tuple[2]);
+    int md = tuple[0] + tuple[1] + tuple[2] - mn - mx;
+    return {mn, md, mx};
+}
+
+Vector3i orientOutwards(Vector3i inds, int extra, const std::vector<Vector3f> &locs) {
+    Vector3f v1 = locs[inds[1]] - locs[inds[0]];
+    Vector3f v2 = locs[inds[2]] - locs[inds[0]];
+    Vector3f e = locs[extra] - locs[inds[0]];
+
+    if (v1.cross(v2).dot(e) > 0) {
+        return {inds[0], inds[2], inds[1]};
+    } else {
+        return inds;
+    }
+}
+
+struct vector_set_hash : std::unary_function<Vector3i, size_t> {
+  std::size_t operator()(Vector3i const& vec) const {
+    Vector3i sorted = sortedTuple(vec);
+    size_t seed = 0;
+    for (int i = 0; i < 3; ++i) {
+      int elem = sorted[i];
+      seed ^= std::hash<int>()(elem) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    }
+    return seed;
+  }
+};
+
+struct vector_set_eq {
+public:
+    bool operator()(const Vector3i & v1, const Vector3i & v2) const {
+        return sortedTuple(v1) == sortedTuple(v2);
+    }
+};
+
+std::vector<Vector3i> Simulation::computeSurfaceFaces(const std::vector<Vector4i> &tets, const std::vector<Vector3f> &locs) {
+    unordered_set<Vector3i, vector_set_hash, vector_set_eq> faces;
+
+    for (Vector4i tet : tets) {
+        Vector3i f1 = orientOutwards({tet[0], tet[1], tet[2]}, tet[3], locs);
+        if (faces.count(f1) > 0) { faces.erase(f1); } else { faces.insert(f1); }
+        Vector3i f2 = orientOutwards({tet[0], tet[1], tet[3]}, tet[2], locs);
+        if (faces.count(f2) > 0) { faces.erase(f2); } else { faces.insert(f2); }
+        Vector3i f3 = orientOutwards({tet[0], tet[2], tet[3]}, tet[1], locs);
+        if (faces.count(f3) > 0) { faces.erase(f3); } else { faces.insert(f3); }
+        Vector3i f4 = orientOutwards({tet[1], tet[2], tet[3]}, tet[0], locs);
+        if (faces.count(f4) > 0) { faces.erase(f4); } else { faces.insert(f4); }
+    }
+
+    std::vector<Vector3i> surfaceFaces{faces.begin(), faces.end()};
+    return surfaceFaces;
 }

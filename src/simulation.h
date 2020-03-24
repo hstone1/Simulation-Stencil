@@ -22,6 +22,9 @@ private:
 
     Shape m_ground;
     void initGround();
+
+private:
+    static std::vector<Eigen::Vector3i> computeSurfaceFaces(const std::vector<Eigen::Vector4i> &tets, const std::vector<Eigen::Vector3f> &locs);
 };
 
 #endif // SIMULATION_H

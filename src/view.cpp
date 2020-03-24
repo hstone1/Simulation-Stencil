@@ -135,10 +135,10 @@ void View::keyPressEvent(QKeyEvent *event)
     else if(event->key() == Qt::Key_D) {
         m_sideways += 1;
     }
-    else if(event->key() == Qt::Key_Q) {
+    else if(event->key() == Qt::Key_Q or event->key() == Qt::Key_Shift) {
         m_vertical -= 1;
     }
-    else if(event->key() == Qt::Key_E) {
+    else if(event->key() == Qt::Key_E or event->key() == Qt::Key_Space) {
         m_vertical += 1;
     } else if(event->key() == Qt::Key_T) {
         m_sim.toggleWire();
@@ -168,10 +168,10 @@ void View::keyReleaseEvent(QKeyEvent *event)
     else if(event->key() == Qt::Key_D) {
         m_sideways -= 1;
     }
-    else if(event->key() == Qt::Key_Q) {
+    else if(event->key() == Qt::Key_Q or event->key() == Qt::Key_Shift) {
         m_vertical += 1;
     }
-    else if(event->key() == Qt::Key_E) {
+    else if(event->key() == Qt::Key_E or event->key() == Qt::Key_Space) {
         m_vertical -= 1;
     }
 }

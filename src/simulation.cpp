@@ -8,8 +8,12 @@
 using namespace Eigen;
 using namespace std;
 
-Simulation::Simulation()
-{
+Simulation::Simulation() {
+}
+
+Simulation::~Simulation() {
+    delete solver;
+    delete system;
 }
 
 void Simulation::init()
@@ -31,11 +35,13 @@ void Simulation::init()
     }
     m_shape.setModelMatrix(Affine3f(Eigen::Translation3f(0, 2, 0)));
 
+    system = new ParticleSystem(vertices.size());
+    solver = new Integrator(system, vertices);
+
     initGround();
 }
 
-void Simulation::update(float seconds)
-{
+void Simulation::update(float seconds) {
     // STUDENTS: This method should contain all the time-stepping logic for your simulation.
     //   Specifically, the code you write here should compute new, updated vertex positions for your
     //   simulation mesh, and it should then call m_shape.setVertices to update the display with those
@@ -44,6 +50,9 @@ void Simulation::update(float seconds)
     // STUDENTS: As currently written, the program will just continually compute simulation timesteps as long
     //    as the program is running (see View::tick in view.cpp) . You might want to e.g. add a hotkey for pausing
     //    the simulation, and perhaps start the simulation out in a paused state.
+
+    solver->step(seconds);
+    m_shape.setVertices(solver->positions());
 }
 
 void Simulation::draw(Shader *shader)

@@ -21,8 +21,10 @@ win32 {
 
 SOURCES += \
     libs/glew-1.10.0/src/glew.c \
+    src/integrator.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
+    src/particlesystem.cpp \
     src/view.cpp \
     src/viewformat.cpp \
     src/graphics/Shader.cpp \
@@ -34,7 +36,9 @@ SOURCES += \
 
 HEADERS += \
     libs/glew-1.10.0/include/GL/glew.h \
+    src/integrator.h \
     src/mainwindow.h \
+    src/particlesystem.h \
     src/view.h \
     src/viewformat.h \
     src/graphics/Shader.h \

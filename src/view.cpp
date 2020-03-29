@@ -1,6 +1,6 @@
 #include "view.h"
-
 #include "viewformat.h"
+#include "clsettings.h"
 
 #include <QApplication>
 #include <QKeyEvent>
@@ -14,7 +14,8 @@ View::View(QWidget *parent) : QGLWidget(ViewFormat(), parent),
     m_time(), m_timer(),
     m_forward(), m_sideways(), m_vertical(),
     m_lastX(), m_lastY(),
-    m_capture(false)
+    m_capture(false),
+    m_frameNumber(0)
 {
     // View needs all mouse move events, not just mouse drag events
     setMouseTracking(true);
@@ -179,7 +180,14 @@ void View::keyReleaseEvent(QKeyEvent *event)
 void View::tick()
 {
     float seconds = m_time.restart() * 0.001f;
-    m_sim.update(seconds);
+    m_sim.update(seconds * ConfigStore::getSpeedFactor());
+
+    if (ConfigStore::rendering()) {
+        QString a = ConfigStore::renderDir() + "/%1.obj";
+
+        m_sim.write(a.arg(m_frameNumber));
+        m_frameNumber++;
+    }
 
     auto look = m_camera.getLook();
     look.y() = 0;

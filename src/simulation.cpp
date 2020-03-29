@@ -1,9 +1,11 @@
 #include "simulation.h"
 
 #include <iostream>
+#include <fstream>
 #include <unordered_set>
 
 #include "graphics/MeshLoader.h"
+#include "clsettings.h"
 
 using namespace Eigen;
 using namespace std;
@@ -24,7 +26,7 @@ void Simulation::init()
     //    load up a tet mesh based on e.g. a file path specified with a command line argument.
     std::vector<Vector3f> vertices;
     std::vector<Vector4i> tets;
-    if(MeshLoader::loadTetMesh("example-meshes/single-tet.mesh", vertices, tets)) {
+    if(MeshLoader::loadTetMesh(ConfigStore::getMeshFilename(), vertices, tets)) {
         // STUDENTS: This code computes the surface mesh of the loaded tet mesh, i.e. the faces
         //    of tetrahedra which are on the exterior surface of the object. Right now, this is
         //    hard-coded for the single-tet mesh. You'll need to implement surface mesh extraction
@@ -35,7 +37,7 @@ void Simulation::init()
     }
     m_shape.setModelMatrix(Affine3f(Eigen::Translation3f(0, 2, 0)));
 
-    system = new ParticleSystem(vertices.size());
+    system = new ParticleSystem(tets, vertices, 100.f, 100.f, 5.f, 5.f, 9.8f);
     solver = new Integrator(system, vertices);
 
     initGround();
@@ -55,19 +57,29 @@ void Simulation::update(float seconds) {
     m_shape.setVertices(solver->positions());
 }
 
-void Simulation::draw(Shader *shader)
-{
+void Simulation::draw(Shader *shader) {
     m_shape.draw(shader);
     m_ground.draw(shader);
 }
 
-void Simulation::toggleWire()
-{
+void Simulation::write(QString filename) {
+    std::ofstream out;
+    out.open(filename.toStdString());
+    for (Vector3f pos : solver->positions()) {
+        out << "v " << pos[0] << " " << pos[1] << " " << pos[2] << endl;
+    }
+    for (Vector3i face : m_shape.faces()) {
+        out << "f " << (1 + face[0]) << " " << (1 + face[1]) << " " << (1 + face[2]) << endl;
+    }
+    out.flush();
+    out.close();
+}
+
+void Simulation::toggleWire() {
     m_shape.toggleWireframe();
 }
 
-void Simulation::initGround()
-{
+void Simulation::initGround() {
     std::vector<Vector3f> groundVerts;
     std::vector<Vector3i> groundFaces;
     groundVerts.emplace_back(-5, 0, -5);

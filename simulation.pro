@@ -36,6 +36,7 @@ SOURCES += \
 
 HEADERS += \
     libs/glew-1.10.0/include/GL/glew.h \
+    src/clsettings.h \
     src/integrator.h \
     src/mainwindow.h \
     src/particlesystem.h \

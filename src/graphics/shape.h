@@ -31,6 +31,8 @@ public:
     void toggleWireframe();
 
     void draw(Shader *shader);
+    const std::vector<Eigen::Vector3i> &faces();
+
 
 private:
     GLuint m_surfaceVao;

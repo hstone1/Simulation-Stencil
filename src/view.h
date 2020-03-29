@@ -52,6 +52,7 @@ private:
     int m_forward, m_sideways, m_vertical;
 
     int m_lastX, m_lastY;
+    int m_frameNumber;
 
     bool m_capture;
 

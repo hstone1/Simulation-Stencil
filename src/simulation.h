@@ -6,6 +6,8 @@
 #include "integrator.h"
 #include "particlesystem.h"
 
+#include <QString>
+
 class Shader;
 
 class Simulation
@@ -19,6 +21,7 @@ public:
     void update(float seconds);
 
     void draw(Shader *shader);
+    void write(QString filename);
 
     void toggleWire();
 private:

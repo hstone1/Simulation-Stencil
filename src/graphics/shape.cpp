@@ -230,3 +230,7 @@ void Shape::draw(Shader *shader)
         glBindVertexArray(0);
     }
 }
+
+const std::vector<Vector3i> &Shape::faces() {
+    return m_faces;
+}

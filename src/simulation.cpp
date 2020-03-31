@@ -4,7 +4,9 @@
 #include <fstream>
 #include <unordered_set>
 
+#include "graphics/sphere.h"
 #include "graphics/MeshLoader.h"
+
 #include "clsettings.h"
 
 using namespace Eigen;
@@ -34,16 +36,30 @@ void Simulation::init()
         //    are surface faces...
         std::vector<Vector3i> faces = computeSurfaceFaces(tets, vertices);
         m_shape.init(vertices, faces, tets);
+
+        system = new ParticleSystem(tets, vertices, 100.f, 100.f, 2.f, 2.f, 1.0f, 9.8f);
+        system->addCollider(new SphereCollider({0, -1000, 0}, 998.f));
+        system->addCollider(new SphereCollider({1.f, -1.4f, 0}, 0.6f));
+
+        solver = new Integrator(system, vertices, faces);
     }
     m_shape.setModelMatrix(Affine3f(Eigen::Translation3f(0, 2, 0)));
 
-    system = new ParticleSystem(tets, vertices, 100.f, 100.f, 5.f, 5.f, 9.8f);
-    solver = new Integrator(system, vertices);
+//    std::vector<Vector3f> sphereVerts;
+//    std::vector<Vector3i> sphereFaces;
+//    for (int i = 0; i < 200; i++) {
+//        sphereVerts.emplace_back(Vector3f{SPHERE_POS[i * 9 + 0], SPHERE_POS[i * 9 + 1], SPHERE_POS[i * 9 + 2]});
+//        sphereVerts.emplace_back(Vector3f{SPHERE_POS[i * 9 + 3], SPHERE_POS[i * 9 + 4], SPHERE_POS[i * 9 + 5]});
+//        sphereVerts.emplace_back(Vector3f{SPHERE_POS[i * 9 + 6], SPHERE_POS[i * 9 + 7], SPHERE_POS[i * 9 + 8]});
+//        sphereFaces.emplace_back(Vector3i{i * 3, i * 3 + 1, i * 3 + 2});
+//    }
+//    m_sphere.init(sphereVerts, sphereFaces);
+
 
     initGround();
 }
 
-void Simulation::update(float seconds) {
+void Simulation::update(float seconds, bool push, Vector3f rayO, Vector3f rayD) {
     // STUDENTS: This method should contain all the time-stepping logic for your simulation.
     //   Specifically, the code you write here should compute new, updated vertex positions for your
     //   simulation mesh, and it should then call m_shape.setVertices to update the display with those
@@ -53,20 +69,21 @@ void Simulation::update(float seconds) {
     //    as the program is running (see View::tick in view.cpp) . You might want to e.g. add a hotkey for pausing
     //    the simulation, and perhaps start the simulation out in a paused state.
 
-    solver->step(seconds);
+    solver->step(seconds, push, rayO, rayD);
     m_shape.setVertices(solver->positions());
 }
 
 void Simulation::draw(Shader *shader) {
     m_shape.draw(shader);
     m_ground.draw(shader);
+    // m_sphere.draw(shader);
 }
 
 void Simulation::write(QString filename) {
     std::ofstream out;
     out.open(filename.toStdString());
     for (Vector3f pos : solver->positions()) {
-        out << "v " << pos[0] << " " << pos[1] << " " << pos[2] << endl;
+        out << "v " << pos[0] << " " << pos[2] << " " << pos[1] << endl;
     }
     for (Vector3i face : m_shape.faces()) {
         out << "f " << (1 + face[0]) << " " << (1 + face[1]) << " " << (1 + face[2]) << endl;

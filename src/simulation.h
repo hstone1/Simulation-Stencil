@@ -18,7 +18,7 @@ public:
 
     void init();
 
-    void update(float seconds);
+    void update(float seconds, bool push, Eigen::Vector3f rayO, Eigen::Vector3f rayD);
 
     void draw(Shader *shader);
     void write(QString filename);
@@ -26,6 +26,7 @@ public:
     void toggleWire();
 private:
     Shape m_shape;
+    // Shape m_sphere;
     Shape m_ground;
     void initGround();
 

@@ -158,6 +158,11 @@ const Eigen::Vector3f &Camera::getLook()
     return m_look;
 }
 
+const Eigen::Vector3f &Camera::getPos()
+{
+    return m_position;
+}
+
 void Camera::setOrbit(bool orbit)
 {
     m_orbit = orbit;

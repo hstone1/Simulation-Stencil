@@ -3,8 +3,8 @@ QT += core gui opengl
 TARGET = simulation
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -std=c++14 -mstackrealign
-CONFIG += c++14
+QMAKE_CXXFLAGS += -std=c++17 -mstackrealign
+CONFIG += c++17
 
 unix:!macx {
     LIBS += -lGLU
@@ -21,6 +21,8 @@ win32 {
 
 SOURCES += \
     libs/glew-1.10.0/src/glew.c \
+    src/collider.cpp \
+    src/geometry/intersections.cpp \
     src/integrator.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
@@ -37,6 +39,9 @@ SOURCES += \
 HEADERS += \
     libs/glew-1.10.0/include/GL/glew.h \
     src/clsettings.h \
+    src/collider.h \
+    src/geometry/intersections.h \
+    src/graphics/sphere.h \
     src/integrator.h \
     src/mainwindow.h \
     src/particlesystem.h \

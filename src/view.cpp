@@ -1,6 +1,9 @@
+
+
 #include "view.h"
 #include "viewformat.h"
 #include "clsettings.h"
+#include "geometry/intersections.h"
 
 #include <QApplication>
 #include <QKeyEvent>
@@ -72,8 +75,7 @@ void View::paintGL()
     m_shader->unbind();
 }
 
-void View::resizeGL(int w, int h)
-{
+void View::resizeGL(int w, int h) {
     glViewport(0, 0, w, h);
     m_camera.setAspect(static_cast<float>(w) / h);
 }
@@ -180,7 +182,15 @@ void View::keyReleaseEvent(QKeyEvent *event)
 void View::tick()
 {
     float seconds = m_time.restart() * 0.001f;
-    m_sim.update(seconds * ConfigStore::getSpeedFactor());
+
+    if (m_capture) {
+        Eigen::Vector3f origin = m_camera.getPos();
+        origin[1] -= 2;
+
+        m_sim.update(seconds * ConfigStore::getSpeedFactor(), true, origin, m_camera.getLook());
+    } else {
+        m_sim.update(seconds * ConfigStore::getSpeedFactor(), false, {0, 0, 0}, {0, 0, 0});
+    }
 
     if (ConfigStore::rendering()) {
         QString a = ConfigStore::renderDir() + "/%1.obj";

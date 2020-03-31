@@ -1,9 +1,13 @@
 #include "integrator.h"
+#include "geometry/intersections.h"
+#include <iostream>
 
 using namespace std;
 using namespace Eigen;
 
-Integrator::Integrator(ParticleSystem *ps, std::vector<Eigen::Vector3f> positions) : pos(positions.begin(), positions.end()), system_(ps) {
+Integrator::Integrator(ParticleSystem *ps,
+                       vector<Vector3f> positions,
+                       vector<Vector3i> &tris) : pos(positions.begin(), positions.end()), system_(ps), m_tris(tris.begin(), tris.end()) {
     vel.reserve(pos.size());
     for (ulong i = 0;i < pos.size(); i++) {
         vel.push_back({0, 0, 0});
@@ -14,7 +18,28 @@ const std::vector<Eigen::Vector3f> &Integrator::positions() const {
     return pos;
 }
 
-void Integrator::step(float dT) {
+void Integrator::step(float dT, bool down, Vector3f rayO, Vector3f rayD) {
+    if (down) {
+        Vector3i *bestTri = nullptr;
+        float bestTime = 10000000;
+        for (Vector3i &tri : m_tris) {
+
+            float time = Geometry::rayTriangleIntersect(rayO, rayD, pos[tri[0]], pos[tri[1]], pos[tri[2]]);
+            if (time > 0 && time < bestTime) {
+                bestTri = &tri;
+                bestTime = time;
+            }
+        }
+
+        if (bestTime < 1000) {
+            vel[bestTri->x()] -= rayD.normalized() * dT * 2000;
+            vel[bestTri->y()] -= rayD.normalized() * dT * 2000;
+            vel[bestTri->z()] -= rayD.normalized() * dT * 2000;
+
+            cout << "hit" << endl;
+        }
+    }
+
     vector<Vector3f> acc1(pos.size());
     vector<Vector3f> acc2(pos.size());
     vector<Vector3f> acc3(pos.size());

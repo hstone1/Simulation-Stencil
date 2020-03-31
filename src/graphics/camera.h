@@ -30,6 +30,8 @@ public:
     const Eigen::Matrix4f& getProjection();
 
     const Eigen::Vector3f &getLook();
+    const Eigen::Vector3f &getPos();
+
 
     void setOrbit(bool orbit);
     void toggleOrbit();

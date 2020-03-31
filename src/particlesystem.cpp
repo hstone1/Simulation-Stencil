@@ -9,7 +9,10 @@ using namespace std;
 using namespace Eigen;
 
 ParticleSystem::ParticleSystem(std::vector<Vector4i> &tets, std::vector<Vector3f> &locs,
-                               float incompressiblity, float rigidity, float viscous_incompressibility, float viscous_rigidity, float gravity) :
+                               float incompressiblity, float rigidity,
+                               float viscous_incompressibility, float viscous_rigidity,
+                               float density,
+                               float gravity) :
     nParticles(locs.size()),
     gravity(gravity),
     nTets(tets.size()),
@@ -34,12 +37,18 @@ ParticleSystem::ParticleSystem(std::vector<Vector4i> &tets, std::vector<Vector3f
         beta_inv << v1, v2, v3;
 
         float volume = abs(v1.cross(v2).dot(v3) / 6);
-        masses[tet[0]] += volume / 4;
-        masses[tet[1]] += volume / 4;
-        masses[tet[2]] += volume / 4;
-        masses[tet[3]] += volume / 4;
+        masses[tet[0]] += volume * density / 4;
+        masses[tet[1]] += volume * density / 4;
+        masses[tet[2]] += volume * density / 4;
+        masses[tet[3]] += volume * density / 4;
 
         betas.push_back(beta_inv.inverse());
+    }
+}
+
+ParticleSystem::~ParticleSystem() {
+    for (auto *col : colliders) {
+        delete col;
     }
 }
 
@@ -49,8 +58,8 @@ void ParticleSystem::computeAcceleration(const std::vector<Vector3f> &pos,
 
     for (ulong i = 0; i < nParticles; i++) {
         accelerations[i] = {0, -gravity, 0};
-        if (pos[i][1] < -2) {
-            accelerations[i][1] += 5000 * (-2 - pos[i][1]);
+        for (auto *collider : colliders) {
+            accelerations[i] += 10000.f * collider->dirToOutside(pos[i]);
         }
     }
 
@@ -101,4 +110,8 @@ void ParticleSystem::computeAcceleration(const std::vector<Vector3f> &pos,
 //    cout << accelerations[0].norm() << endl;
 
 
+}
+
+void ParticleSystem::addCollider(Collider *col) {
+    colliders.emplace_back(col);
 }

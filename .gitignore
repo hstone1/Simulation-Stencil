@@ -11,3 +11,4 @@ moc_*
 ui_mainwindow.h
 qrc_shaders.cpp
 output
+results

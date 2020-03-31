@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "GL/glew.h"
-#include "Eigen/Dense"
+#include "HEigenLib.h"
 #include <unsupported/Eigen/OpenGLSupport>
 
 

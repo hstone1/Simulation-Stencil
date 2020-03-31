@@ -1,7 +1,7 @@
 #ifndef COLLIDER_H
 #define COLLIDER_H
 
-#include <Eigen/Core>
+#include "HEigenLib.h"
 
 class Collider {
 public:

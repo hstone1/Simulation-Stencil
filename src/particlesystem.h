@@ -1,20 +1,9 @@
 #ifndef PARTICLESYSTEM_H
 #define PARTICLESYSTEM_H
 
+
+#include "HEigenLib.h"
 #include "collider.h"
-
-#include <libs/Eigen/StdVector>
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3f);
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector4i);
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector4f);
-
-#ifndef VEC3I_VECTOR_SPEC
-#define VEC3I_VECTOR_SPEC
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3i);
-#endif
-
-
-#include <libs/Eigen/Core>
 #include <vector>
 
 

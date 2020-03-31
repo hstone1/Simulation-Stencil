@@ -4,20 +4,10 @@
 #include <GL/glew.h>
 #include <vector>
 
-#define EIGEN_DONT_VECTORIZE
-#define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT
-#include <Eigen/StdVector>
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix2f)
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix3f)
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix3i)
 
-#ifndef VEC3I_VECTOR_SPEC
-#define VEC3I_VECTOR_SPEC
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3i)
-#endif
+#include "HEigenLib.h"
 
 
-#include <Eigen/Dense>
 
 class Shader;
 

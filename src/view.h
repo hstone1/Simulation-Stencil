@@ -11,12 +11,6 @@
 #include <QTimer>
 #include <memory>
 
-#include <libs/Eigen/StdVector>
-#ifndef VEC3I_VECTOR_SPEC
-#define VEC3I_VECTOR_SPEC
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3i)
-#endif
-
 /**
  * This is similar to your "CS1971FrontEnd" class. Here you will receive all of the input events
  * to forward to your game.
@@ -60,6 +54,9 @@ private:
 
     int m_lastX, m_lastY;
     int m_frameNumber;
+
+    int m_push;
+    int m_pull;
 
     bool m_capture;
 

@@ -1,0 +1,26 @@
+## How to run the simulator
+./simulation <mesh_file> [optional speed factor] [optional --render <frame directory>]
+
+examples:
+./simulation example-meshes/cube.mesh						# Likely to explode
+./simulation example-meshes/cube.mesh 0.1					# Slower simulation will not explode
+./simulation example-meshes/ellipsoid 0.1 --render output/frames		# Expects output/frames to already exist
+
+
+## Features Implemented
+ - Surface Mesh Extraction 			(See simulation.cpp)
+ - Gravity Force 				(See ParticleSystem::computeAcceleration)
+ - Internal Elastic Forces 			(See ParticleSystem::computeAcceleration and ParticleSystem::ParticleSystem)
+ - Collision Penalty Resolution 		(See ParticleSystem::computeAcceleration and collider.cpp SphereCollider::dirToOutside)
+ - Viscous damping forces			(See ParticleSystem::computeAcceleration)
+ - RK5 Simulation Integration			(See Integrator::step)
+ - Push (Z) and Pull (X) Controls		(See View.cpp and Integrator::step && geometry::rayTriangleIntersect)
+
+
+## Videos
+Videos are for the most part rendered in blender using a custom script to import each mesh.
+
+results/ellipsoid.mp4 		shows basic ellipsoid behavior
+results/sphere.mp4		shows sphere with push / pull
+results/tug.mp4			shows ellipsoid with push / pull
+push_pull2.mp4			shows actual UI usage

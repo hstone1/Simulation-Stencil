@@ -1,9 +1,8 @@
 #ifndef MESHLOADER_H
 #define MESHLOADER_H
 
+#include "HEigenLib.h"
 #include <vector>
-#include <Eigen/Dense>
-#include <Eigen/StdVector>
 
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix4i)
 

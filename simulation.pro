@@ -38,6 +38,7 @@ SOURCES += \
 
 HEADERS += \
     libs/glew-1.10.0/include/GL/glew.h \
+    src/HEigenLib.h \
     src/clsettings.h \
     src/collider.h \
     src/geometry/intersections.h \

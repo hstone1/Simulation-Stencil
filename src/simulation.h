@@ -18,7 +18,7 @@ public:
 
     void init();
 
-    void update(float seconds, bool push, Eigen::Vector3f rayO, Eigen::Vector3f rayD);
+    void update(float seconds, float power, Eigen::Vector3f rayO, Eigen::Vector3f rayD);
 
     void draw(Shader *shader);
     void write(QString filename);
@@ -26,13 +26,14 @@ public:
     void toggleWire();
 private:
     Shape m_shape;
-    // Shape m_sphere;
+    Shape m_sphere;
     Shape m_ground;
     void initGround();
 
 private:
     ParticleSystem *system;
     Integrator *solver;
+
 
 private:
     static std::vector<Eigen::Vector3i> computeSurfaceFaces(const std::vector<Eigen::Vector4i> &tets, const std::vector<Eigen::Vector3f> &locs);

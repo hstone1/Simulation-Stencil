@@ -11,6 +11,7 @@
 #include <iostream>
 
 using namespace std;
+using namespace Eigen;
 
 View::View(QWidget *parent) : QGLWidget(ViewFormat(), parent),
     m_window(parent->parentWidget()),
@@ -97,6 +98,7 @@ void View::mouseMoveEvent(QMouseEvent *event)
             m_camera.rotate(-deltaX * 0.01f, deltaY * 0.01f);
         }
     }
+
     m_lastX = event->x();
     m_lastY = event->y();
 }
@@ -128,6 +130,12 @@ void View::keyPressEvent(QKeyEvent *event)
     }
     else if(event->key() == Qt::Key_W) {
         m_forward += 1;
+    }
+    else if(event->key() == Qt::Key_X) {
+        m_push = 1;
+    }
+    else if(event->key() == Qt::Key_Z) {
+        m_pull = 1;
     }
     else if(event->key() == Qt::Key_S) {
         m_forward -= 1;
@@ -168,6 +176,12 @@ void View::keyReleaseEvent(QKeyEvent *event)
     else if(event->key() == Qt::Key_A) {
         m_sideways += 1;
     }
+    else if(event->key() == Qt::Key_X) {
+        m_push = 0;
+    }
+    else if(event->key() == Qt::Key_Z) {
+        m_pull = 0;
+    }
     else if(event->key() == Qt::Key_D) {
         m_sideways -= 1;
     }
@@ -183,13 +197,26 @@ void View::tick()
 {
     float seconds = m_time.restart() * 0.001f;
 
-    if (m_capture) {
+    if (m_push - m_pull != 0) {
+        Matrix4f ip = (m_camera.getProjection()).inverse();
+        Matrix4f iv = (m_camera.getView()).inverse();
+
         Eigen::Vector3f origin = m_camera.getPos();
+
+        Vector4f dest(
+                    ((2.f * m_lastX) / width()) - 1,
+                    1 - ((2.f * m_lastY) / height()),
+                    -1, 1);
+        dest = ip * dest;
+        dest[3] = 1.f;
+        dest = iv * dest;
+        Vector3f dir = (dest.head<3>() - origin).normalized();
+
         origin[1] -= 2;
 
-        m_sim.update(seconds * ConfigStore::getSpeedFactor(), true, origin, m_camera.getLook());
+        m_sim.update(seconds * ConfigStore::getSpeedFactor(), m_push - m_pull, origin, dir);
     } else {
-        m_sim.update(seconds * ConfigStore::getSpeedFactor(), false, {0, 0, 0}, {0, 0, 0});
+        m_sim.update(seconds * ConfigStore::getSpeedFactor(), 0, {0, 0, 0}, {1, 1, 1});
     }
 
     if (ConfigStore::rendering()) {

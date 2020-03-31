@@ -45,21 +45,22 @@ void Simulation::init()
     }
     m_shape.setModelMatrix(Affine3f(Eigen::Translation3f(0, 2, 0)));
 
-//    std::vector<Vector3f> sphereVerts;
-//    std::vector<Vector3i> sphereFaces;
-//    for (int i = 0; i < 200; i++) {
-//        sphereVerts.emplace_back(Vector3f{SPHERE_POS[i * 9 + 0], SPHERE_POS[i * 9 + 1], SPHERE_POS[i * 9 + 2]});
-//        sphereVerts.emplace_back(Vector3f{SPHERE_POS[i * 9 + 3], SPHERE_POS[i * 9 + 4], SPHERE_POS[i * 9 + 5]});
-//        sphereVerts.emplace_back(Vector3f{SPHERE_POS[i * 9 + 6], SPHERE_POS[i * 9 + 7], SPHERE_POS[i * 9 + 8]});
-//        sphereFaces.emplace_back(Vector3i{i * 3, i * 3 + 1, i * 3 + 2});
-//    }
-//    m_sphere.init(sphereVerts, sphereFaces);
+    std::vector<Vector3f> sphereVerts;
+    std::vector<Vector3i> sphereFaces;
+    for (int i = 0; i < 200; i++) {
+        sphereVerts.emplace_back(2 * Vector3f{SPHERE_POS[i * 9 + 0], SPHERE_POS[i * 9 + 1], SPHERE_POS[i * 9 + 2]});
+        sphereVerts.emplace_back(2 * Vector3f{SPHERE_POS[i * 9 + 3], SPHERE_POS[i * 9 + 4], SPHERE_POS[i * 9 + 5]});
+        sphereVerts.emplace_back(2 * Vector3f{SPHERE_POS[i * 9 + 6], SPHERE_POS[i * 9 + 7], SPHERE_POS[i * 9 + 8]});
+        sphereFaces.emplace_back(Vector3i{i * 3, i * 3 + 1, i * 3 + 2});
+    }
+    m_sphere.init(sphereVerts, sphereFaces);
+    m_sphere.setModelMatrix(Affine3f(Translation3f(1.f, -1.4f + 2, 0) * Scaling(0.6f)));
 
 
     initGround();
 }
 
-void Simulation::update(float seconds, bool push, Vector3f rayO, Vector3f rayD) {
+void Simulation::update(float seconds, float power, Vector3f rayO, Vector3f rayD) {
     // STUDENTS: This method should contain all the time-stepping logic for your simulation.
     //   Specifically, the code you write here should compute new, updated vertex positions for your
     //   simulation mesh, and it should then call m_shape.setVertices to update the display with those
@@ -69,14 +70,14 @@ void Simulation::update(float seconds, bool push, Vector3f rayO, Vector3f rayD) 
     //    as the program is running (see View::tick in view.cpp) . You might want to e.g. add a hotkey for pausing
     //    the simulation, and perhaps start the simulation out in a paused state.
 
-    solver->step(seconds, push, rayO, rayD);
+    solver->step(seconds, power, rayO, rayD);
     m_shape.setVertices(solver->positions());
 }
 
 void Simulation::draw(Shader *shader) {
     m_shape.draw(shader);
     m_ground.draw(shader);
-    // m_sphere.draw(shader);
+    m_sphere.draw(shader);
 }
 
 void Simulation::write(QString filename) {

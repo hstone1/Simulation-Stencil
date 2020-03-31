@@ -9,7 +9,7 @@ public:
     Integrator(ParticleSystem *ps, std::vector<Eigen::Vector3f> positions,
                std::vector<Eigen::Vector3i> &tris);
     const std::vector<Eigen::Vector3f> &positions() const;
-    void step(float time, bool down, Eigen::Vector3f rayO, Eigen::Vector3f rayD);
+    void step(float time, float power, Eigen::Vector3f rayO, Eigen::Vector3f rayD);
 
 private:
     std::vector<Eigen::Vector3f> pos;

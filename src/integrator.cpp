@@ -18,8 +18,8 @@ const std::vector<Eigen::Vector3f> &Integrator::positions() const {
     return pos;
 }
 
-void Integrator::step(float dT, bool down, Vector3f rayO, Vector3f rayD) {
-    if (down) {
+void Integrator::step(float dT, float power, Vector3f rayO, Vector3f rayD) {
+    if (power != 0) {
         Vector3i *bestTri = nullptr;
         float bestTime = 10000000;
         for (Vector3i &tri : m_tris) {
@@ -32,11 +32,9 @@ void Integrator::step(float dT, bool down, Vector3f rayO, Vector3f rayD) {
         }
 
         if (bestTime < 1000) {
-            vel[bestTri->x()] -= rayD.normalized() * dT * 2000;
-            vel[bestTri->y()] -= rayD.normalized() * dT * 2000;
-            vel[bestTri->z()] -= rayD.normalized() * dT * 2000;
-
-            cout << "hit" << endl;
+            vel[bestTri->x()] -= rayD.normalized() * dT * 2000 * power;
+            vel[bestTri->y()] -= rayD.normalized() * dT * 2000 * power;
+            vel[bestTri->z()] -= rayD.normalized() * dT * 2000 * power;
         }
     }
 
